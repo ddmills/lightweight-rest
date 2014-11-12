@@ -6,25 +6,38 @@ abstract class Rest_Resource {
     
     protected $request;
     
+    public function __construct($request) {
+        $this->request = $request;
+    }
+    
     public function perform_request() {
         $method = 'resource_' . strtolower($this->request->method);
         if (method_exists($this, $method)) {
-            return call_user_func(array($this, $method));
+            return call_user_func_array(array($this, $method), array($this->request));
         } else {
             throw new Exception('Unexpected header request method. Expected POST, GET, PUT, or DELETE.', 405);
         }
     }
     
     /* CREATE */
-    abstract protected function resource_post();
+    protected function resource_post($request) { throw new Exception('Method not allowed', 405); }
     
     /* READ */
-    abstract protected function resource_get();
+    protected function resource_get($request) { throw new Exception('Method not allowed', 405); }
     
     /* UPDATE */
-    abstract protected function resource_put();
+    protected function resource_put($request) { throw new Exception('Method not allowed', 405); }
     
     /* DELETE */
-    abstract protected function resource_delete();
-
+    protected function resource_delete($request) { throw new Exception('Method not allowed', 405); }
+    
+    /* Utility function for checking for inputs */
+    protected function require_input($input) {
+        if (isset($this->request->inputs[$input])) {
+            return $this->request->inputs[$input];
+        } else {
+            throw new Exception('Variable "' . $input . '" was not provided', 400);
+        }
+    }
+    
 } ?>

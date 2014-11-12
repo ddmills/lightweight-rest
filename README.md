@@ -15,26 +15,40 @@ Setup your .htaccess file to re-direct all requests to the api root (index.php)
 ```
 
 ##Step 2
-Setup your resources. Thesea are objects that extend the Rest_Resource class which define the CRUD operations.
+Setup your resources. These are objects that extend the Rest_Resource class which define the CRUD operations.
 
-If we were to have a deck of cards, we might have four resources: a collection of decks, a deck, a collection of cards, a card.
+If we were to have a deck of cards, we might have four resources: collection of decks, deck, collection of cards, and a card.
 
 Anything that the CRUD methods return will be converted into JSON. This is what the Deck_Resource might look like:
 ```php
 <?php
 class Deck_Resource extends Rest_Resource {
     /* CREATE */
-    public function resource_post() {
-        return 'Created an object';
+    public function resource_post($request) {
+        /* get inputs called "name" and "cards" */
+        $name = $request->inputs->get('name');
+        $cards = $request->inputs->get('cards');
+        
+        if ($name && $cards) {
+            return 'Created an object called ' . $name;
+        } else {
+            throw new Exception('Missing paramters', 400);
+        }
     }
     
     /* READ */
-    public function resource_get() {
-        return 'You retrieved a deck!';
+    public function resource_get($request) {
+        /* This is where you would perform database operations */
+    
+        /* retrieve the variable from the URI.
+         * alternatively, use inputs->get($key) */
+        $deck_id = $request->inputs->uri('deck_id');
+        return 'You want a deck with id: ' . $deck_id;
     }
     
     /* UPDATE */
-    public function resource_put() {
+    public function resource_put($request) {
+        /* Return arrays of data, which will later be converted to json */
         return array(
             'update_time' => '.025 seconds',
             'changed' => '5 properties changed',
@@ -43,9 +57,10 @@ class Deck_Resource extends Rest_Resource {
     }
     
     /* DELETE */
-    public function resource_delete() {
-        /* you can throw an exception if you don't want this action to be performed */
-        throw new Exception('This resource cannot be deleted.' 405);
+    public function resource_delete($request) {
+        /* you can throw an exception if you don't want this action to be performed. 
+         *Alternatively, if you simply leave the method out, it will also throw an exception when called. */
+        throw new Exception('This deck cannot be deleted', 405);
     }
 }
 ?>

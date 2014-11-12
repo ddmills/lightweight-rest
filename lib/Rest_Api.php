@@ -2,6 +2,7 @@
 require_once('Rest_Request.php');
 require_once('Rest_Response.php');
 require_once('Rest_Resource.php');
+require_once('Rest_Inputs.php');
 
 class Rest_Api {
     
@@ -16,12 +17,6 @@ class Rest_Api {
      * A URL mapping of resources and variables
      */
     protected $mapping = array();
-    
-    /**
-     * Property: root
-     * API Root
-     */
-    protected $root = '';
     
     /**
      * Property: resource_root
@@ -46,18 +41,22 @@ class Rest_Api {
         $this->resource_root = $resource_root;
     }
     
+    /* Check if CORS is enabled */
     public function cors_enabled() {
         return $this->CORS_ENABLED;
     }
     
+    /* Enable CORS */
     public function enable_cors() {
         $this->CORS_ENABLED = true;
     }
     
+    /* Disable CORS */
     public function disable_cors() {
         $this->CORS_ENABLED = false;
     }
     
+    /* Process the current request */
     public function process() {
         try {
             $this->request = new Rest_Request();
@@ -70,19 +69,13 @@ class Rest_Api {
             
             foreach($this->request->endpoint as $index => $key) {
                             
-                if (isset($current['dir'])) {
-                    if (isset($current['dir'][$key])) {
-                        $current = &$current['dir'][$key];
-                    }
-                } elseif (isset($current['num'])) {
-                    if (is_numeric($key)) {
-                        $inlined_parameters[$current['num']['vname']] = intval($key);
-                    }
+                if (isset($current['dir']) && isset($current['dir'][$key])) {
+                    $current = &$current['dir'][$key];
+                } elseif (isset($current['num']) && is_numeric($key)) {
+                    $this->request->inputs->uri[$current['num']['vname']] = intval($key);
                     $current = &$current['num'];
-                } elseif (isset($current['str'])) {
-                    if (is_string($key)) {
-                        $inlined_parameters[$current['str']['vname']] = $key;
-                    }
+                } elseif (isset($current['str']) && is_string($key)) {
+                    $this->request->inputs->uri[$current['str']['vname']] = $key;
                     $current = &$current['str'];
                 }
                 
@@ -111,19 +104,20 @@ class Rest_Api {
                     throw new Exception('Resource file is not a valid Rest_Resource object.', 500);
                 }
             } else {
-                throw new Exception('Resource file does not exist!', 404);
+                throw new Exception('Resource file does not exist!', 500);
             }
             
             new Rest_Response($this, $data);
     
         } catch (Exception $e) {
+        
             new Rest_Response($this, $e->getMessage(), $e->getCode());
         }
-        
     }
     
     
     /*
+     * TODO - consolidate two for loops into one!
      * Map a URL to a Rest_Resource Classname
      */
     public function map($url, $resource) {
@@ -186,5 +180,4 @@ class Rest_Api {
             }
         }
     }
-
 } ?>

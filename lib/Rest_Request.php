@@ -3,11 +3,17 @@ class Rest_Request {
     
     public $method;
     public $endpoint;
-    public $body;
+    public $inputs;
     
     public function __construct() {
         $this->method = $_SERVER['REQUEST_METHOD'];
-        $this->endpoint = explode('/', trim($_REQUEST['_url'], '/'));
+        
+        if (isset($_REQUEST['_url'])) {
+            $this->endpoint = explode('/', trim($_REQUEST['_url'], '/'));
+            unset($_REQUEST['_url']);
+        } else {
+            throw new Exception('Invalid URL request', 404);
+        }
         
         if ($this->method == 'POST' && array_key_exists('HTTP_X_HTTP_METHOD', $_SERVER)) {
             if ($_SERVER['HTTP_X_HTTP_METHOD'] == 'DELETE') {
@@ -19,22 +25,8 @@ class Rest_Request {
             }
         }
         
-        $this->inputs = $this->clean_inputs($_REQUEST);
-        $this->body = file_get_contents('php://input');
+        $this->inputs = new Rest_Inputs();
         
         return true;
     }
-    
-    private function clean_inputs($data) {
-        $clean_input = array();
-        if (is_array($data)) {
-            foreach ($data as $key => $value) {
-                $clean_input[$key] = $this->clean_inputs($value);
-            }
-        } else {
-            $clean_input = trim(strip_tags($data));
-        }
-        return $clean_input;
-    }
-
 } ?>
