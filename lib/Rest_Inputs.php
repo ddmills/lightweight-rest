@@ -78,4 +78,3 @@ class Rest_Inputs {
         return htmlspecialchars($data);
     }
 } ?>
-    
