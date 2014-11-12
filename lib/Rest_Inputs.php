@@ -15,7 +15,8 @@ class Rest_Inputs {
     
     public function __construct() {
         $this->uri = array();
-        $this->body = @json_decode(file_get_contents('php://input'));
+        $this->body = @json_decode(file_get_contents('php://input'), true);
+        $this->body = $this->body == null ? array() : $this->body;
         $this->query = $this->sanitize_inputs($_REQUEST); /* TODO - should this be set to $_GET instead? */
     }
     
@@ -23,40 +24,39 @@ class Rest_Inputs {
      * Check all inputs for given key. 
      * Precedence as follows: URI > body > query.
      * @param String $key key to search for
-     * @return mixed null, or value of key requested
+     * @return mixed value of key requested or void if doesn't exist.
      */
     public function get($key) {
         if (isset($this->uri[$key])) { return $this->uri[$key]; }
         if (isset($this->body[$key])) { return $this->body[$key]; }
         if (isset($this->query[$key])) { return $this->query[$key]; }
-        return null;
     }
     
     /*
      * Check uri array for given key.
      * @param String $key key to search for
-     * @return mixed null, or value of key requested
+     * @return mixed void or value of key requested
      */
     public function uri($key) {
-        return isset($this->uri[$key]) ? $this->uri[$key] : null;
+        return $this->uri[$key];
     }
     
     /*
      * Check body array for given key.
      * @param String $key key to search for
-     * @return mixed null, or value of key requested
+     * @return mixed void or value of key requested
      */
     public function body($key) {
-        return isset($this->body[$key]) ? $this->body[$key] : null;
+        return $this->body[$key];
     }
     
     /*
      * Check query array for given key.
      * @param String $key key to search for
-     * @return mixed null, or value of key requested
+     * @return mixed void or value of key requested
      */
     public function query($key) {
-        return isset($this->query[$key]) ? $this->query[$key] : null;
+        return $this->query[$key];
     }
     
     private function sanitize_inputs($data) {
@@ -76,5 +76,30 @@ class Rest_Inputs {
      * Sanitize a single input */
     private function sanitize_input($data) {
         return htmlspecialchars($data);
+    }
+    
+    /*
+     * Require an input to be present
+     * @param
+     * @return
+     */
+    public function requires($key, $type=null) {
+        if ($type) {
+            if ($type == 'uri') {
+                $val = $this->uri($key);
+            } elseif ($type == 'body') {
+                $val = $this->body($key);
+            } elseif ($type =='query') {
+                $val = $this->query($key);
+            }
+        } else {
+            $val = $this->get($key);
+        }
+        
+        if (isset($val)) {
+            return $val;
+        } else {
+            throw new Exception('Input "' . $key . '" missing', 400);
+        }
     }
 } ?>
