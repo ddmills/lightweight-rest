@@ -20,24 +20,14 @@ abstract class Rest_Resource {
     }
     
     /* CREATE */
-    protected function resource_post($request) { throw new Exception('Method not allowed', 405); }
+    protected function resource_post($request) { throw new Exception('The POST request is not available for this resource', 405); }
     
     /* READ */
-    protected function resource_get($request) { throw new Exception('Method not allowed', 405); }
+    protected function resource_get($request) { throw new Exception('The GET request is not available for this resource', 405); }
     
     /* UPDATE */
-    protected function resource_put($request) { throw new Exception('Method not allowed', 405); }
+    protected function resource_put($request) { throw new Exception('The PUT request is not available for this resource', 405); }
     
     /* DELETE */
-    protected function resource_delete($request) { throw new Exception('Method not allowed', 405); }
-    
-    /* Utility function for checking for inputs */
-    protected function require_input($input) {
-        if (isset($this->request->inputs[$input])) {
-            return $this->request->inputs[$input];
-        } else {
-            throw new Exception('Variable "' . $input . '" was not provided', 400);
-        }
-    }
-    
+    protected function resource_delete($request) { throw new Exception('The DELETE request is not available for this resource', 405); }
 } ?>
