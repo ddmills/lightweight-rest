@@ -38,7 +38,7 @@ class Rest_Inputs {
      * @return mixed void or value of key requested
      */
     public function uri($key) {
-        return $this->uri[$key];
+        return @$this->uri[$key];
     }
     
     /*
@@ -47,7 +47,7 @@ class Rest_Inputs {
      * @return mixed void or value of key requested
      */
     public function body($key) {
-        return $this->body[$key];
+        return @$this->body[$key];
     }
     
     /*
@@ -56,7 +56,7 @@ class Rest_Inputs {
      * @return mixed void or value of key requested
      */
     public function query($key) {
-        return $this->query[$key];
+        return @$this->query[$key];
     }
     
     private function sanitize_inputs($data) {
