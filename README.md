@@ -1,4 +1,4 @@
-Lightweight-PHP-REST-Service
+Lightweight REST Service for PHP
 ============================
 
 Create a json REST service in php quickly.
