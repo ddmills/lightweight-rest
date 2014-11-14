@@ -19,6 +19,12 @@ class Rest_Api {
     protected $mapping = array();
     
     /**
+     * Property: headers_sent
+     * set true when headers have been sent
+     */
+    protected $headers_sent = false;
+    
+    /**
      * Property: resource_root
      * Root folder of Rest_Resource object
      */
@@ -35,10 +41,18 @@ class Rest_Api {
      */
     public function __construct($resource_root = '') {
         $this->resource_root = $resource_root;
+        register_shutdown_function(array($this, '_send_fatal_error_shutdown'));
     }
     
     public function set_resource_root($resource_root) {
         $this->resource_root = $resource_root;
+    }
+    
+    public function _send_fatal_error_shutdown() {
+        $error = error_get_last();
+        if ($error) {
+            new Rest_Response($this, $error, 500);
+        }
     }
     
     /* Check if CORS is enabled */
@@ -54,6 +68,16 @@ class Rest_Api {
     /* Disable CORS */
     public function disable_cors() {
         $this->CORS_ENABLED = false;
+    }
+    
+    /* Check if headers have been sent yet */
+    public function headers_sent() {
+        return $this->headers_sent;
+    }
+    
+    /* signal that the headers have been sent */
+    public function set_headers_sent() {
+        $this->headers_sent = true;
     }
     
     /* Process the current request */
