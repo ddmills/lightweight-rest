@@ -17,7 +17,7 @@ class Rest_Inputs {
         $this->uri = array();
         $this->body = @json_decode(file_get_contents('php://input'), true);
         $this->body = $this->body == null ? array() : $this->body;
-        $this->query = $this->sanitize_inputs($_REQUEST); /* TODO - should this be set to $_GET instead? */
+        $this->query = $this->sanitize_inputs($_GET);
     }
     
     /*
@@ -75,7 +75,7 @@ class Rest_Inputs {
      * TODO - improve this?
      * Sanitize a single input */
     private function sanitize_input($data) {
-        return htmlspecialchars($data);
+        return urldecode($data);
     }
     
     /*
