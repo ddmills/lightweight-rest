@@ -1,41 +1,47 @@
 <?php
 class Rest_Response {
-    public function __construct($api, $data, $code = 200) {
-        if (!$api->headers_sent()) {
-            $codes = array(
-                200 => 'OK',
-                201 => 'Created',
-                204 => 'No Content',
-                400 => 'Bad Request',
-                301 => 'Moved Permanently',
-                401 => 'Unauthorized',
-                403 => 'Forbidden',
-                404 => 'Not Found',
-                405 => 'Method Not Allowed',
-                409 => 'Conflict',
-                431 => 'Request Header Fields Too Large',
-                500 => 'Internal Server Error',
-                501 => 'Not Implemented',
-                503 => 'Service Unavailable'
-            );
-            
-            $code = array_key_exists($code, $codes) ? $code : 500;
-            
-            if ($api->cors_enabled()) {
-                header('Access-Control-Allow-Origin: *');
-                header('Access-Control-Allow-Methods: *');
-            }
-            header('Content-Type: application/json; charset=utf-8');
-            header('HTTP/1.1 ' . $code . ' ' . $codes[$code]);
-            
-            $resp = array(
-                'status' => $code == 200 ? 'success' : 'failure',
-                'code' => $code,
-                'data' => $data
-            );
-            
-            echo json_encode($resp);
-            $api->set_headers_sent();
-        }
+  public function __construct($api, $data, $code = 200) {
+    if (!$api->headers_sent()) {
+      $codes = array(
+        200 => array('success' => true, 'message' => 'OK'),
+        201 => array('success' => true, 'message' => 'Created'),
+        204 => array('success' => true, 'message' => 'No Content'),
+        400 => array('success' => false, 'message' => 'Bad Request'),
+        301 => array('success' => false, 'message' => 'Moved Permanently'),
+        401 => array('success' => false, 'message' => 'Unauthorized'),
+        403 => array('success' => false, 'message' => 'Forbidden'),
+        404 => array('success' => false, 'message' => 'Not Found'),
+        405 => array('success' => false, 'message' => 'Method Not Allowed'),
+        409 => array('success' => false, 'message' => 'Conflict'),
+        431 => array('success' => false, 'message' => 'Request Header Fields Too Large'),
+        500 => array('success' => false, 'message' => 'Internal Server Error'),
+        501 => array('success' => false, 'message' => 'Not Implemented'),
+        503 => array('success' => false, 'message' => 'Service Unavailable')
+      );
+
+      $code = array_key_exists($code, $codes) ? $code : 500;
+
+      if ($api->cors_enabled()) {
+        header('Access-Control-Allow-Origin: *');
+        header('Access-Control-Allow-Methods: *');
+      }
+      header('Content-Type: application/json; charset=utf-8');
+      header('HTTP/1.1 ' . $code . ' ' . $codes[$code]['message']);
+
+      $resp = '';
+
+      if ($api->format_output()) {
+        $resp = array(
+          'status' => $codes[$code]['success'] ? 'success' : 'failure',
+          'code' => $code,
+          'data' => $data
+        );
+      } else {
+        $resp = $data;
+      }
+
+      echo json_encode($resp);
+      $api->set_headers_sent();
     }
+  }
 } ?>
