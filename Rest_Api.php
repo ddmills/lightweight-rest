@@ -154,7 +154,7 @@ class Rest_Api {
   public function map($url, $resource) {
     $parts = explode('/', $url);
     $count = count($parts) - 1;
-    $location = [];
+    $location = array();
     foreach($parts as $index=>$part) {
       $var = substr($part, 0, 5);
       if ($var == '{num:') {
