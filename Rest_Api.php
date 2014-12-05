@@ -37,11 +37,11 @@ class Rest_Api {
   protected $CORS_ENABLED = false;
 
   /*
-   * Property: OUTPUT_FORMATTED
+   * Property: FORMAT_OUTPUT
    * should output be formatted to {status:"", code: "", data: ""}
    * or just output data
    */
-  protected $OUTPUT_FORMATTED = false;
+  protected $FORMAT_OUTPUT = false;
 
   /*
    * @param String $resource_root The location of the resource folder
@@ -64,9 +64,9 @@ class Rest_Api {
 
   public function format_output($val = null) {
     if (!is_null($val)) {
-      $this->OUTPUT_FORMATTED = $val ? true : false;
+      $this->FORMAT_OUTPUT = $val ? true : false;
     }
-    return $this->OUTPUT_FORMATTED;
+    return $this->FORMAT_OUTPUT;
   }
 
   /* Check if CORS is enabled */
