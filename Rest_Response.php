@@ -19,14 +19,17 @@ class Rest_Response {
         503 => array('success' => false, 'message' => 'Service Unavailable')
       );
 
-      $code = array_key_exists($code, $codes) ? $code : 500;
+      $protocol = isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0';
+      $code     = array_key_exists($code, $codes) ? $code : 500;
+      $message  = $codes[$code]['message'];
 
       if ($api->cors_enabled()) {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: *');
       }
+
       header('Content-Type: application/json; charset=utf-8');
-      header('HTTP/1.1 ' . $code . ' ' . $codes[$code]['message']);
+      header($protocol . ' ' . $code . ' ' . $message);
 
       $resp = '';
 

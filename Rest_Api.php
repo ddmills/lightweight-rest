@@ -152,9 +152,10 @@ class Rest_Api {
    * Map a URL to a Rest_Resource Classname
    */
   public function map($url, $resource) {
-    $parts = explode('/', $url);
-    $count = count($parts) - 1;
+    $parts    = explode('/', $url);
+    $count    = count($parts) - 1;
     $location = array();
+
     foreach($parts as $index=>$part) {
       $var = substr($part, 0, 5);
       if ($var == '{num:') {
