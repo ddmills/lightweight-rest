@@ -142,7 +142,7 @@ class Rest_Api {
 
     } catch (Exception $e) {
 
-      new Rest_Response($this, $e->getMessage(), $e->getCode());
+      new Rest_Response($this, array('error' => $e->getMessage()), $e->getCode());
     }
   }
 

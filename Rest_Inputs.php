@@ -16,7 +16,7 @@ class Rest_Inputs {
   public function __construct() {
     $this->uri   = array();
     $this->body  = @json_decode(file_get_contents('php://input'), true);
-    $this->body  = $this->body == null ? array() : $this->body;
+    $this->body  = $this->body == null ? $this->sanitize_inputs($_POST) : $this->body;
     $this->query = $this->sanitize_inputs($_GET);
   }
 
@@ -30,6 +30,14 @@ class Rest_Inputs {
     if (isset($this->uri[$key])) { return $this->uri[$key]; }
     if (isset($this->body[$key])) { return $this->body[$key]; }
     if (isset($this->query[$key])) { return $this->query[$key]; }
+  }
+
+  /*
+   * Conver the inputs to an array
+   * @return all inputs in merged array format
+   */
+  public function to_array() {
+    return array_merge($this->uri, $this->body, $this->query);
   }
 
   /*
@@ -80,17 +88,25 @@ class Rest_Inputs {
 
   /*
    * Require an input to be present
-   * @param
-   * @return
+   * @param $key the input key requested to be present
+   * @param $type the method type, must by uri, body, or query.
+   * If left blank, it will check all
+   * @return the value of given key
    */
   public function requires($key, $type=null) {
     if ($type) {
-      if ($type == 'uri') {
-        $val = $this->uri($key);
-      } elseif ($type == 'body') {
-        $val = $this->body($key);
-      } elseif ($type =='query') {
-        $val = $this->query($key);
+      switch ($type) {
+        case 'uri':
+          $val = $this->uri($key);
+          break;
+        case 'body':
+          $val = $this->body($key);
+          break;
+        case 'query':
+          $val = $this->query($key);
+          break;
+        default:
+          throw new Exception('Invalid input type requested. Must be "uri", "body", or "query"', 500);
       }
     } else {
       $val = $this->get($key);
