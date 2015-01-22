@@ -43,7 +43,12 @@ class Rest_Response {
         $resp = $data;
       }
 
-      echo json_encode($resp);
+      if ($api->pretty_print()) {
+        echo json_encode($resp, JSON_PRETTY_PRINT);
+      } else {
+        echo json_encode($resp);
+      }
+      
       $api->set_headers_sent();
     }
   }

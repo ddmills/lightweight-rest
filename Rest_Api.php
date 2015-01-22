@@ -44,6 +44,12 @@ class Rest_Api {
   protected $FORMAT_OUTPUT = false;
 
   /*
+   * Property: PRETTY_PRINT
+   * json that is output will be 'pretty printed'
+   */
+  protected $PRETTY_PRINT = false;
+
+  /*
    * @param String $resource_root The location of the resource folder
    */
   public function __construct($resource_root = '') {
@@ -62,6 +68,7 @@ class Rest_Api {
     }
   }
 
+  /* Set or get output formatted */
   public function format_output($val = null) {
     if (!is_null($val)) {
       $this->FORMAT_OUTPUT = $val ? true : false;
@@ -69,12 +76,20 @@ class Rest_Api {
     return $this->FORMAT_OUTPUT;
   }
 
-  /* Check if CORS is enabled */
+  /* Set or get CORS enabled */
   public function cors_enabled($val = null) {
     if (!is_null($val)) {
       $this->CORS_ENABLED = $val ? true : false;
     }
     return $this->CORS_ENABLED;
+  }
+
+  /* Set or get pretty print */
+  public function pretty_print($val = null) {
+    if (!is_null($val)) {
+      $this->PRETTY_PRINT = $val ? true : false;
+    }
+    return $this->PRETTY_PRINT;
   }
 
   /* Check if headers have been sent yet */
