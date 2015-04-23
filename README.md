@@ -1,10 +1,24 @@
-Lightweight REST Service for PHP
-============================
+# Lightweight REST Service for PHP
 
-Create a json REST service in php quickly.
+Create a json REST service in php quickly. This library allows you to quickly route URL's to "resources", and within those resources you have CRUD operations.
 
-##Step 1
-Setup your .htaccess file to re-direct all requests to the api root (index.php)
+## Directory Structure
+
+```
+website/
+    |_ api/
+    |    |_ .htaccess
+    |    |_ index.php
+    |    |_ resources/
+    |        |_ SomeResource.php
+    |        |_ SomeOtherResource.php
+    |        |_ moreResources/
+    |        |   |_ ...
+    |        .
+```
+
+## .htaccess File (SETUP)
+Create an .htaccess file in root of your api directory. In this example, the route is a folder called `api`. Configure the .htaccess file to route all requests under `api/` to the `index.php` file in the root. Note that you could all it `api.php` instead, as long as it matches in the .htaccess file.
 ```
 <IfModule mod_rewrite.c>
     RewriteEngine On
@@ -14,7 +28,69 @@ Setup your .htaccess file to re-direct all requests to the api root (index.php)
 </IfModule>
 ```
 
-##Step 2
+This means that any incoming request to `www.example.com/api/some/odd/path/4` will be routed to `www.example.com/api/` where it can be processed by the library.
+
+## Api root index.php
+```php
+<?php
+/* Include the API library */
+require_once('lib/Rest_Api.php');
+
+/* Create a new API with resources located in given relative folder */
+$api = new Rest_Api('resources/');
+
+/* Define URLs to route to resources */
+$api->map('decks/', 'DeckCollection_Resource.php');
+$api->map('decks/{num:deck_id}/', 'Deck_Resource.php');
+$api->map('decks/{num:deck_id}/cards/', 'CardCollection_Resource.php');
+$api->map('decks/{num:deck_id}/cards/{num:card_id}', 'Card_Resource.php');
+
+/* Lastly, process the request */
+$api->process();
+?>
+```
+
+## Resource files
+A resource must extend the `Rest_Resource` class, and it should be located in your resources folder within the api. Note that i can be in subdirectories. This class will define four CRUD operations (POST, GET, PUT, DELETE). In this example we're making a flascard deck resource, called `Deck_Resource.php`. Note that the classname must match the file name.
+
+```php
+<?php
+class Deck_Resource extends Rest_Resource {
+    ...
+}
+?>
+```
+
+Within this resource class, you can overwrite any (or none) of the four methods:
+```php
+public function resource_post(Rest_Request $request)
+public function resource_get(Rest_Request $request)
+public function resource_put(Rest_Request $request)
+public function resource_delete(Rest_Request $request)
+```
+
+Note that each of those methods is given a [Rest_Request](https://github.com/ddmills/lightweight-rest/blob/master/Rest_Request.php) object.
+
+## The Rest_Request Object
+
+The Rest_Request object provides some variables that you can use to process the request. For our example, if we defined in our api:
+
+```php
+$api->map('decks/{num:deck_id}/', 'Deck_Resource.php');
+```
+
+if someone makes a `GET` request to `www.example.com/api/decks/58`, meaning "Give me the deck with id 58", we would have:
+
+```php
+<?php
+class Deck_Resource extends Rest_Resource {
+    ...
+}
+?>
+```
+
+
+## Step 2
 Setup your resources. These are objects that extend the Rest_Resource class which define the CRUD operations.
 
 If we were to have a deck of cards, we might have four resources: collection of decks, deck, collection of cards, and a card.
