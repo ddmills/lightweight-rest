@@ -92,6 +92,11 @@ class Rest_Api {
     return $this->PRETTY_PRINT;
   }
 
+  /* Get the mapping between urls and resources */
+  public function mapping() {
+    return $this->mapping;
+  }
+
   /* Check if headers have been sent yet */
   public function headers_sent() {
     return $this->headers_sent;
@@ -109,7 +114,6 @@ class Rest_Api {
 
       $current = &$this->mapping;
       $count = count($this->request->endpoint) - 1;
-      $inlined_parameters = array();
 
       $resource = '';
 
@@ -146,7 +150,7 @@ class Rest_Api {
         include_once($this->resource_root . $resource);
         $base = basename($resource, '.php');
         if (is_subclass_of($base, 'Rest_Resource')) {
-          $res = new $base($this->request);
+          $res = new $base($this->request, $this);
           $data = $res->perform_request();
         } else {
           throw new Exception('Resource file is not a valid Rest_Resource object.', 500);
