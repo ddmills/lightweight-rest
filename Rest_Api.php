@@ -123,6 +123,8 @@ class Rest_Api {
         } elseif (isset($current['str']) && is_string($key)) {
           $this->request->inputs->uri[$current['str']['vname']] = $key;
           $current = &$current['str'];
+        } else {
+          throw new Exception('Resource not found.', 404);
         }
 
         if ($index == $count) {
